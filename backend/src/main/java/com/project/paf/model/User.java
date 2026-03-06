@@ -10,14 +10,18 @@ import lombok.Setter;
 @Table(name = "users")
 public class User {
 
-    // ===== SETTERS =====
-    // ===== GETTERS =====
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
+
+    @Column(unique = true)
     private String email;
+
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
 }
