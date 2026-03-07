@@ -29,8 +29,15 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-indigo-100 selection:text-indigo-900">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md transform transition-all duration-500 hover:scale-[1.01]">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-indigo-500/30 relative overflow-hidden font-sans">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-[10%] -right-[5%] w-[40%] h-[40%] rounded-full bg-gradient-to-br from-indigo-300/30 to-purple-300/30 blur-[80px] animate-[pulse_8s_ease-in-out_infinite]" />
+        <div className="absolute top-[40%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-tr from-cyan-300/30 to-blue-300/30 blur-[100px] animate-[pulse_10s_ease-in-out_infinite_alternate]" />
+        <div className="absolute -bottom-[20%] right-[10%] w-[40%] h-[40%] rounded-full bg-gradient-to-bl from-rose-200/30 to-orange-200/30 blur-[80px]" />
+      </div>
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md transform transition-all duration-500 hover:scale-[1.01] relative z-10">
         <div className="text-center mb-8">
           <Link
             to="/"

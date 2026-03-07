@@ -1,38 +1,67 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
-  // Spring Security Login
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, login } = useAuth();
+
+  // Make sure 'from' never accidentally loops back to /login
+  const from =
+    location.state?.from?.pathname === "/login"
+      ? "/dashboard"
+      : location.state?.from?.pathname || "/dashboard";
+
+  // Watch for the user state to populate, then navigate safely
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+
     try {
-      const res = await api.post("/auth/login", {
-        email,
-        password,
-      });
+      const res = await api.post("/auth/login", { email, password });
 
-      localStorage.setItem("user", JSON.stringify(res.data));
+      console.log("🟢 Backend Response Data:", res.data);
 
-      navigate("/dashboard");
+      if (res.data && res.data.role) {
+        // Just call login. The useEffect above will instantly catch the change and navigate.
+        login(res.data);
+      } else {
+        alert("Login failed: The server did not return user details.");
+      }
     } catch (err) {
       alert("Invalid email or password");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Google Redirect Login (Spring Security handles everything)
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:8081/oauth2/authorization/google";
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-indigo-100 selection:text-indigo-900">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md transform transition-all duration-500 hover:scale-[1.01]">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-indigo-500/30 relative overflow-hidden font-sans">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-[10%] -right-[5%] w-[40%] h-[40%] rounded-full bg-gradient-to-br from-indigo-300/30 to-purple-300/30 blur-[80px] animate-[pulse_8s_ease-in-out_infinite]" />
+        <div className="absolute top-[40%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-tr from-cyan-300/30 to-blue-300/30 blur-[100px] animate-[pulse_10s_ease-in-out_infinite_alternate]" />
+        <div className="absolute -bottom-[20%] right-[10%] w-[40%] h-[40%] rounded-full bg-gradient-to-bl from-rose-200/30 to-orange-200/30 blur-[80px]" />
+      </div>
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md transform transition-all duration-500 hover:scale-[1.01] relative z-10">
         <div className="text-center mb-8">
           <Link
             to="/"
@@ -43,15 +72,11 @@ const Login = () => {
           <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
             Welcome back
           </h2>
-          <p className="mt-2 text-sm text-slate-600">
-            Access the campus operations hub
-          </p>
         </div>
 
         <div className="bg-white py-8 px-4 shadow-2xl shadow-slate-200/50 sm:rounded-2xl sm:px-10 border border-slate-100 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-cyan-400"></div>
 
-          {/* GOOGLE LOGIN BUTTON */}
           <div className="mb-6">
             <button
               onClick={handleGoogleLogin}
@@ -77,7 +102,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* EMAIL LOGIN */}
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">
@@ -110,7 +134,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-all duration-300 disabled:opacity-70"
+              className="w-full py-3 px-4 rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-all duration-300 disabled:opacity-70 flex justify-center items-center"
             >
               {isLoading ? "Authenticating..." : "Sign in to account"}
             </button>

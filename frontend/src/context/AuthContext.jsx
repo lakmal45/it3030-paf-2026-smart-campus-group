@@ -1,52 +1,65 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 
-// 1. Create the context
 const AuthContext = createContext();
 
-// 2. Create the Provider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Prevents flickering before auth is checked
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check storage on initial load
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+
+    if (storedUser && storedUser !== "undefined") {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (typeof parsedUser === "object" && parsedUser !== null) {
+          setUser(parsedUser);
+        } else {
+          localStorage.removeItem("user");
+        }
+      } catch (error) {
+        localStorage.removeItem("user");
+      }
     }
     setLoading(false);
   }, []);
 
-  const login = (userData) => {
+  // Wrap in useCallback to prevent infinite render loops!
+  const login = useCallback((userData) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
-  };
+  }, []);
 
-  const logout = () => {
-    setUser(null);
+  // Wrap in useCallback
+  const logout = useCallback(() => {
     localStorage.removeItem("user");
-    // Trigger Spring Boot logout endpoint
+    setUser(null);
     window.location.href = "http://localhost:8081/logout";
-  };
+  }, []);
 
-  // The value object contains everything you want to share globally
   const value = {
     user,
-    role: user?.role || null, // Convenient shorthand
+    setUser,
+    role: user?.role || null,
     login,
     logout,
     isAuthenticated: !!user,
+    isLoading: loading,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {/* Only render the app once we've checked localStorage */}
       {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-// 3. Create a custom hook for easy importing
 export const useAuth = () => {
   return useContext(AuthContext);
 };
