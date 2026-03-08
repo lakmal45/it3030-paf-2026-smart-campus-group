@@ -1,0 +1,63 @@
+import {
+  LayoutDashboard,
+  Calendar,
+  PlusCircle,
+  Ticket,
+  User,
+  Users,
+  Shield,
+  Settings,
+  FileText,
+  BarChart,
+  Wrench,
+  CheckSquare,
+  History,
+} from "lucide-react";
+
+export const roleNavigation = {
+  USER: [
+    { name: "Overview", path: "/dashboard/user", icon: LayoutDashboard },
+    { name: "My Bookings", path: "/dashboard/user/bookings", icon: Calendar },
+    {
+      name: "Create Booking",
+      path: "/dashboard/user/create-booking",
+      icon: PlusCircle,
+    },
+    { name: "My Tickets", path: "/dashboard/user/tickets", icon: Ticket },
+    { name: "Profile", path: "/dashboard/user/profile", icon: User },
+  ],
+  ADMIN: [
+    { name: "Dashboard", path: "/dashboard/admin", icon: LayoutDashboard },
+    { name: "User Management", path: "/dashboard/admin/users", icon: Users },
+    { name: "Role Management", path: "/dashboard/admin/roles", icon: Shield },
+    {
+      name: "System Settings",
+      path: "/dashboard/admin/settings",
+      icon: Settings,
+    },
+  ],
+  MANAGER: [
+    { name: "Dashboard", path: "/dashboard/manager", icon: LayoutDashboard },
+    { name: "Reports", path: "/dashboard/manager/reports", icon: FileText },
+    {
+      name: "Booking Analytics",
+      path: "/dashboard/manager/analytics",
+      icon: BarChart,
+    },
+    { name: "Maintenance", path: "/dashboard/manager/maintenance", icon: Wrench },
+  ],
+  TECHNICIAN: [
+    { name: "Dashboard", path: "/dashboard/technician", icon: LayoutDashboard },
+    {
+      name: "Assigned Tickets",
+      path: "/dashboard/technician/tickets",
+      icon: Ticket,
+    },
+    {
+      name: "Update Status",
+      path: "/dashboard/technician/update-status",
+      icon: CheckSquare,
+    },
+    { name: "History", path: "/dashboard/technician/history", icon: History },
+  ],
+};

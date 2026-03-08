@@ -12,13 +12,34 @@ import OAuthSuccess from "./components/OAuthSuccess";
 
 // Layout & Protection
 import DashboardLayout from "./layout/DashboardLayout";
-import ProtectedRoute from "./components/RoleProtectedRoute"; 
+import ProtectedRoute from "./components/RoleProtectedRoute";
 
 // Dashboards
 import UserDashboard from "./pages/user/UserDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
 import TechnicianDashboard from "./pages/technician/TechnicianDashboard";
+
+// User Pages
+import MyBookings from "./pages/user/MyBookings";
+import CreateBooking from "./pages/user/CreateBooking";
+import MyTickets from "./pages/user/MyTickets";
+import Profile from "./pages/user/Profile";
+
+// Admin Pages
+import UserManagement from "./pages/admin/UserManagement";
+import RoleManagement from "./pages/admin/RoleManagement";
+import SystemSettings from "./pages/admin/SystemSettings";
+
+// Manager Pages
+import Reports from "./pages/manager/Reports";
+import BookingAnalytics from "./pages/manager/BookingAnalytics";
+import Maintenance from "./pages/manager/Maintenance";
+
+// Technician Pages
+import AssignedTickets from "./pages/technician/AssignedTickets";
+import UpdateStatus from "./pages/technician/UpdateStatus";
+import History from "./pages/technician/History";
 
 // A smart component to redirect to the correct dashboard based on role
 const RoleBasedRedirect = () => {
@@ -66,39 +87,165 @@ function App() {
             {/* The index route does the smart role redirection */}
             <Route index element={<RoleBasedRedirect />} />
 
-            {/* Specific Role Views */}
-            <Route
-              path="user"
-              element={
-                <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
-                  <UserDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="admin"
-              element={
-                <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="manager"
-              element={
-                <ProtectedRoute allowedRoles={["MANAGER", "ROLE_MANAGER"]}>
-                  <ManagerDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="technician"
-              element={
-                <ProtectedRoute allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}>
-                  <TechnicianDashboard />
-                </ProtectedRoute>
-              }
-            />
+            {/* User Routes */}
+            <Route path="user">
+              <Route
+                index
+                element={
+                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
+                    <UserDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="bookings"
+                element={
+                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
+                    <MyBookings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="create-booking"
+                element={
+                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
+                    <CreateBooking />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="tickets"
+                element={
+                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
+                    <MyTickets />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="profile"
+                element={
+                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            {/* Admin Routes */}
+            <Route path="admin">
+              <Route
+                index
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="users"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
+                    <UserManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="roles"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
+                    <RoleManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="settings"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
+                    <SystemSettings />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            {/* Manager Routes */}
+            <Route path="manager">
+              <Route
+                index
+                element={
+                  <ProtectedRoute allowedRoles={["MANAGER", "ROLE_MANAGER"]}>
+                    <ManagerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="reports"
+                element={
+                  <ProtectedRoute allowedRoles={["MANAGER", "ROLE_MANAGER"]}>
+                    <Reports />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="analytics"
+                element={
+                  <ProtectedRoute allowedRoles={["MANAGER", "ROLE_MANAGER"]}>
+                    <BookingAnalytics />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="maintenance"
+                element={
+                  <ProtectedRoute allowedRoles={["MANAGER", "ROLE_MANAGER"]}>
+                    <Maintenance />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            {/* Technician Routes */}
+            <Route path="technician">
+              <Route
+                index
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
+                  >
+                    <TechnicianDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="tickets"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
+                  >
+                    <AssignedTickets />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="update-status"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
+                  >
+                    <UpdateStatus />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="history"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
+                  >
+                    <History />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
           </Route>
 
           {/* Fallback Unauthorized/Not Found */}

@@ -63,11 +63,17 @@ const Login = () => {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md transform transition-all duration-500 hover:scale-[1.01] relative z-10">
         <div className="text-center mb-8">
-          <Link
-            to="/"
-            className="text-lg font-bold text-indigo-600 hover:text-indigo-700 transition-colors duration-200"
-          >
-            Smart Campus Operations
+          <Link to="/" className="flex justify-center items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
+              <span className="text-xl font-bold text-white tracking-widest">
+                SC
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold tracking-tight text-slate-800 bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-700">
+                Smart Campus
+              </span>
+            </div>
           </Link>
           <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
             Welcome back

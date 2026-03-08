@@ -2,6 +2,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState, useRef, useEffect } from "react";
 import { Menu, X, LogOut, User, Settings, ChevronDown, Bell, LayoutDashboard, Search, HelpCircle } from "lucide-react";
+import { roleNavigation } from "../routes/navigation";
 
 const DashboardLayout = () => {
   const { user, logout } = useAuth();
@@ -9,6 +10,9 @@ const DashboardLayout = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileDropdownRef = useRef(null);
   const location = useLocation();
+
+  const userRole = user?.role?.toUpperCase() || "USER";
+  const navigationLinks = roleNavigation[userRole] || roleNavigation.USER;
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
@@ -75,26 +79,27 @@ const DashboardLayout = () => {
           <div className="mb-8">
             <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Main Menu</p>
             <nav className="space-y-1.5">
-              <Link
-                to="/dashboard"
-                className={`flex items-center gap-3 px-3 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
-                  location.pathname === "/dashboard" 
-                    ? "bg-indigo-50 text-indigo-700 font-semibold shadow-sm" 
-                    : "hover:bg-slate-50 hover:text-slate-900 font-medium text-slate-500"
-                }`}
-              >
-                {location.pathname === "/dashboard" && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-600 rounded-r-md" />
-                )}
-                <LayoutDashboard size={20} className={`transition-transform duration-300 group-hover:scale-110 ${location.pathname === "/dashboard" ? "text-indigo-600" : "text-slate-400 group-hover:text-slate-700"}`} />
-                Overview
-              </Link>
-              {/* Add more custom links here, e.g.
-              <Link to="/courses" className="flex items-center gap-3 px-3 py-3 rounded-2xl transition-all duration-300 group hover:bg-slate-50 hover:text-slate-900 font-medium text-slate-500">
-                 <BookOpen size={20} className="text-slate-400 group-hover:text-slate-700 transition-transform duration-300 group-hover:scale-110" />
-                 Courses
-              </Link>
-              */}
+              {navigationLinks.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
+                      isActive 
+                        ? "bg-indigo-50 text-indigo-700 font-semibold shadow-sm" 
+                        : "hover:bg-slate-50 hover:text-slate-900 font-medium text-slate-500"
+                    }`}
+                  >
+                    {isActive && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-600 rounded-r-md" />
+                    )}
+                    <Icon size={20} className={`transition-transform duration-300 group-hover:scale-110 ${isActive ? "text-indigo-600" : "text-slate-400 group-hover:text-slate-700"}`} />
+                    {item.name}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
         </div>

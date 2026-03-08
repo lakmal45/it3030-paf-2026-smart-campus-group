@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -7,7 +7,6 @@ const OAuthSuccess = () => {
   const navigate = useNavigate();
   const { login, user } = useAuth();
   const hasProcessed = useRef(false);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     // If the user is already set in context, redirect them safely
