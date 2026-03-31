@@ -4,7 +4,6 @@ import com.project.paf.model.User;
 import com.project.paf.repository.UserRepository;
 import com.project.paf.service.UserService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

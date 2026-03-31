@@ -32,6 +32,10 @@ public class UserService {
         User user = repo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        if (user.getPassword() == null) {
+            throw new RuntimeException("This account uses Google Sign-In. Please login with Google.");
+        }
+
         if (!encoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }

@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -62,13 +61,12 @@ public class SecurityConfig {
                         // public endpoints
                         .requestMatchers("/", "/api/auth/**").permitAll()
 
+                        // admin endpoints – session check is handled manually in AdminController
+                        .requestMatchers("/api/admin/**").permitAll()
+
                         // booking endpoints
                         .requestMatchers("/api/bookings/**")
                         .hasAnyRole("USER","ADMIN","MANAGER")
-
-                        // admin endpoints
-                        .requestMatchers("/api/admin/**")
-                        .hasRole("ADMIN")
 
                         // technician endpoints
                         .requestMatchers("/api/tickets/update/**")
@@ -79,6 +77,20 @@ public class SecurityConfig {
                         .hasRole("MANAGER")
 
                         .anyRequest().authenticated()
+                )
+
+                // Return 401/403 JSON for API calls instead of redirecting to OAuth2
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(401);
+                            response.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(403);
+                            response.getWriter().write("{\"error\":\"Forbidden\"}");
+                        })
                 )
 
                 .oauth2Login(oauth -> oauth

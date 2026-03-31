@@ -40,7 +40,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             user = new User();
             user.setEmail(email);
             user.setName(name);
-            user.setPassword("GOOGLE_USER");
+            user.setPassword(null); // Google users have no local password
 
             // default role
             user.setRole(Role.USER);
