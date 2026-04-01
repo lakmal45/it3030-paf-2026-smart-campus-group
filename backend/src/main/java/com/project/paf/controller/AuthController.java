@@ -1,10 +1,8 @@
 package com.project.paf.controller;
 
 import com.project.paf.model.User;
-import com.project.paf.repository.UserRepository;
 import com.project.paf.service.UserService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,11 +11,9 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService service;
-    private final UserRepository repo;
 
-    public AuthController(UserService service, UserRepository repo) {
+    public AuthController(UserService service) {
         this.service = service;
-        this.repo = repo;
     }
 
     // REGISTER
