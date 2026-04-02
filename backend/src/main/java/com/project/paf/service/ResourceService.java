@@ -25,6 +25,19 @@ public class ResourceService {
                 .toList();
     }
 
+        public List<ResourceResponseDTO> getFilteredResources(
+            String name,
+            String type,
+            String location,
+            Integer minCapacity,
+            Boolean available
+        ) {
+        return resourceRepository.findByFilters(name, type, location, minCapacity, available)
+            .stream()
+            .map(this::toResponseDTO)
+            .toList();
+        }
+
     public ResourceResponseDTO getResourceById(Long id) {
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Resource not found with id: " + id));
