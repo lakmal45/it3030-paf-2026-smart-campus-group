@@ -2,6 +2,7 @@ package com.project.paf.service;
 
 import com.project.paf.dto.ResourceRequestDTO;
 import com.project.paf.dto.ResourceResponseDTO;
+import com.project.paf.exception.ResourceNotFoundException;
 import com.project.paf.model.Resource;
 import com.project.paf.repository.ResourceRepository;
 import jakarta.validation.Valid;
@@ -40,7 +41,7 @@ public class ResourceService {
 
     public ResourceResponseDTO getResourceById(Long id) {
         Resource resource = resourceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Resource not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
         return toResponseDTO(resource);
     }
 
@@ -52,7 +53,7 @@ public class ResourceService {
 
     public ResourceResponseDTO updateResource(Long id, @Valid ResourceRequestDTO requestDTO) {
         Resource existingResource = resourceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Resource not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
 
         existingResource.setName(requestDTO.getName());
         existingResource.setType(requestDTO.getType());
@@ -68,7 +69,7 @@ public class ResourceService {
 
     public void deleteResource(Long id) {
         Resource existingResource = resourceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Resource not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
         resourceRepository.delete(existingResource);
     }
 
