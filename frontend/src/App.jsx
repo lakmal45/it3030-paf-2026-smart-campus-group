@@ -37,6 +37,8 @@ import Reports from "./pages/manager/Reports";
 import BookingAnalytics from "./pages/manager/BookingAnalytics";
 import Maintenance from "./pages/manager/Maintenance";
 import ResourceListPage from "./pages/manager/ResourceListPage";
+import ResourceDetailPage from "./pages/manager/ResourceDetailPage";
+import ResourceFormPage from "./pages/manager/ResourceFormPage";
 
 // Technician Pages
 import AssignedTickets from "./pages/technician/AssignedTickets";
@@ -126,8 +128,16 @@ function App() {
               <Route
                 path="resources"
                 element={
-                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
+                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER", "ADMIN", "ROLE_ADMIN", "MANAGER", "ROLE_MANAGER"]}>
                     <ResourceListPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="resources/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER", "ADMIN", "ROLE_ADMIN", "MANAGER", "ROLE_MANAGER"]}>
+                    <ResourceDetailPage />
                   </ProtectedRoute>
                 }
               />
@@ -175,6 +185,30 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="resources/new"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
+                    <ResourceFormPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="resources/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
+                    <ResourceDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="resources/:id/edit"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
+                    <ResourceFormPage />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
 
             {/* Manager Routes */}
@@ -216,6 +250,22 @@ function App() {
                 element={
                   <ProtectedRoute allowedRoles={["MANAGER", "ROLE_MANAGER"]}>
                     <ResourceListPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="resources/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["MANAGER", "ROLE_MANAGER"]}>
+                    <ResourceDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="resources/:id/edit"
+                element={
+                  <ProtectedRoute allowedRoles={["MANAGER", "ROLE_MANAGER"]}>
+                    <ResourceFormPage />
                   </ProtectedRoute>
                 }
               />
