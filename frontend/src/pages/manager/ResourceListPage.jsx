@@ -54,7 +54,7 @@ const ResourceListPage = () => {
     e.stopPropagation(); // Prevent navigation to detail page
     if (window.confirm("Are you sure you want to delete this resource?")) {
       try {
-        await resourceService.deleteResource(id);
+        await resourceService.delete(id);
         setSuccessMessage("Resource deleted successfully");
         fetchResources();
       } catch (err) {
@@ -172,11 +172,11 @@ const ResourceListPage = () => {
                 
                 <div className="space-y-4 mb-6 bg-slate-50/80 rounded-2xl p-4 border border-slate-100">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-500 font-semibold flex items-center"><MapPin className="h-4 w-4 mr-2" /> Location</span>
+                    <span className="text-slate-500 font-semibold flex items-center">Location</span>
                     <span className="font-bold text-slate-800">{resource.location}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-500 font-semibold flex items-center"><Users className="h-4 w-4 mr-2" /> Capacity</span>
+                    <span className="text-slate-500 font-semibold flex items-center">Capacity</span>
                     <span className="font-bold text-slate-800">{resource.capacity}</span>
                   </div>
                 </div>
@@ -238,8 +238,8 @@ const ResourceListPage = () => {
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap">
                         <div className="flex flex-col space-y-1">
-                          <div className="flex items-center text-xs text-slate-600 font-semibold"><MapPin className="h-3 w-3 mr-1.5 text-slate-400" />{resource.location}</div>
-                          <div className="flex items-center text-xs text-slate-600 font-semibold"><Users className="h-3 w-3 mr-1.5 text-slate-400" />Capacity: {resource.capacity}</div>
+                          <div className="flex items-center text-xs text-slate-600 font-semibold">{resource.location}</div>
+                          <div className="flex items-center text-xs text-slate-600 font-semibold">Capacity: {resource.capacity}</div>
                         </div>
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap">
@@ -291,6 +291,19 @@ const ResourceListPage = () => {
                   <tr>
                     <td colSpan="5" className="px-6 py-16 text-center text-slate-500 italic font-medium">
                        No resources match your current selection.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ResourceListPage;
                     </td>
                   </tr>
                 )}

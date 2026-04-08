@@ -11,22 +11,22 @@ const resourceService = {
     return response.data;
   },
 
-  getResourceById: async (id) => {
+  getById: async (id) => {
     const response = await api.get(`/resources/${id}`);
     return response.data;
   },
 
-  createResource: async (resourceData) => {
+  create: async (resourceData) => {
     const response = await api.post("/resources", resourceData);
     return response.data;
   },
 
-  updateResource: async (id, resourceData) => {
+  update: async (id, resourceData) => {
     const response = await api.put(`/resources/${id}`, resourceData);
     return response.data;
   },
 
-  deleteResource: async (id) => {
+  delete: async (id) => {
     await api.delete(`/resources/${id}`);
   },
 
