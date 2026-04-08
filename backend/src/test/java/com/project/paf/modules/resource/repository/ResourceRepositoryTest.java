@@ -5,18 +5,16 @@ import com.project.paf.modules.resource.model.ResourceStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@SpringBootTest
+@Transactional
 class ResourceRepositoryTest {
-
-    @Autowired
-    private TestEntityManager entityManager;
 
     @Autowired
     private ResourceRepository resourceRepository;
@@ -30,7 +28,7 @@ class ResourceRepositoryTest {
         r1.setCapacity(30);
         r1.setAvailable(true);
         r1.setStatus(ResourceStatus.ACTIVE);
-        entityManager.persist(r1);
+        resourceRepository.save(r1);
 
         Resource r2 = new Resource();
         r2.setName("Room 202");
@@ -39,9 +37,7 @@ class ResourceRepositoryTest {
         r2.setCapacity(10);
         r2.setAvailable(false);
         r2.setStatus(ResourceStatus.IN_MAINTENANCE);
-        entityManager.persist(r2);
-
-        entityManager.flush();
+        resourceRepository.save(r2);
     }
 
     @Test
