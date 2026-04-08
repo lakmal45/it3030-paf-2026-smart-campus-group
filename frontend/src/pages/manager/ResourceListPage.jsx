@@ -32,7 +32,7 @@ const ResourceListPage = () => {
 
   const handleCreate = async (formData) => {
     try {
-      await resourceService.createResource(formData);
+      await resourceService.create(formData);
       setIsFormOpen(false);
       setServerErrors({});
       fetchResources();
@@ -47,7 +47,7 @@ const ResourceListPage = () => {
 
   const handleUpdate = async (formData) => {
     try {
-      await resourceService.updateResource(editingResource.id, formData);
+      await resourceService.update(editingResource.id, formData);
       setEditingResource(null);
       setServerErrors({});
       fetchResources();
@@ -63,7 +63,7 @@ const ResourceListPage = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this resource?")) {
       try {
-        await resourceService.deleteResource(id);
+        await resourceService.delete(id);
         fetchResources();
       } catch (err) {
         void err;
