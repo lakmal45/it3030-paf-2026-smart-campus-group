@@ -1,7 +1,7 @@
 package com.project.paf.ticket;
 
-import com.project.paf.modules.auth.model.User;
-import com.project.paf.modules.auth.repository.UserRepository;
+import com.project.paf.modules.user.model.User;
+import com.project.paf.modules.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -203,7 +203,7 @@ public class TicketController {
             throw new org.springframework.security.access.AccessDeniedException("Not authenticated");
         }
         return userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new com.project.paf.exception.ResourceNotFoundException(
+                .orElseThrow(() -> new com.project.paf.modules.resource.exception.ResourceNotFoundException(
                         "Authenticated user not found: " + principal.getName()));
     }
 }

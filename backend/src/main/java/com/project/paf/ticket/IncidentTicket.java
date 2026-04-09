@@ -1,6 +1,6 @@
 package com.project.paf.ticket;
 
-import com.project.paf.modules.auth.model.User;
+import com.project.paf.modules.user.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
