@@ -1,12 +1,14 @@
 package com.project.paf.config;
 
-import com.project.paf.modules.auth.service.OAuth2LoginSuccessHandler;
-import com.project.paf.modules.user.repository.UserRepository;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -14,8 +16,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-import java.util.List;
+import com.project.paf.modules.auth.service.OAuth2LoginSuccessHandler;
+import com.project.paf.modules.user.repository.UserRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -29,17 +31,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/login/**", "/oauth2/**").permitAll()
-                        .anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(new OAuth2LoginSuccessHandler(userRepository)));
-
-        return http.build();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -55,13 +48,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }<<<<<<<<<
-
-    Temporary merge branch 1=========
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -82,16 +68,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/bookings/**")
                         .hasAnyRole("USER", "ADMIN", "MANAGER")
 
-                        // technician endpoints
-                        .requestMatchers("/api/tickets/update/**")
-                        .hasRole("TECHNICIAN")
-
-                        // manager endpoints
-                        .requestMatchers("/api/reports/**")
-                        .hasRole("MANAGER")
-
-                        // Member 3 – ticket endpoints (role checks done via @PreAuthorize)
-                        .requestMatchers("/api/tickets/**").authenticated()
+                        // Member 3 – ticket endpoints (PermitAll allows manual session + header check in controller)
+                        .requestMatchers("/api/tickets/**").permitAll()
 
                         .anyRequest().authenticated())
 
@@ -120,7 +98,5 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID"));
 
         return http.build();
-    }>>>>>>>>>
-
-    Temporary merge branch 2
+    }
 }

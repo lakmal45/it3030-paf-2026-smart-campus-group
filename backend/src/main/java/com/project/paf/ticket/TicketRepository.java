@@ -1,10 +1,11 @@
 package com.project.paf.ticket;
 
-import com.project.paf.modules.auth.model.User;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.project.paf.modules.user.model.User;
 
 /**
  * Spring Data JPA repository for {@link IncidentTicket}.

@@ -1,9 +1,9 @@
 package com.project.paf.ticket;
 
-import com.project.paf.exception.ResourceNotFoundException;
-import com.project.paf.modules.auth.model.Role;
-import com.project.paf.modules.auth.model.User;
-import com.project.paf.modules.auth.repository.UserRepository;
+import com.project.paf.modules.resource.exception.ResourceNotFoundException;
+import com.project.paf.modules.user.model.Role;
+import com.project.paf.modules.user.model.User;
+import com.project.paf.modules.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;

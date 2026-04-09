@@ -9,7 +9,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import OAuthSuccess from "./components/OAuthSuccess";
-import Profile from "./pages/Profile";
+import GeneralProfile from "./pages/Profile";
 import Settings from "./pages/Settings";
 
 // Layout & Protection
@@ -26,7 +26,7 @@ import TechnicianDashboard from "./pages/technician/TechnicianDashboard";
 import MyBookings from "./pages/user/MyBookings";
 import CreateBooking from "./pages/user/CreateBooking";
 import MyTickets from "./pages/user/MyTickets";
-import Profile from "./pages/user/Profile";
+import UserProfile from "./pages/user/Profile";
 import CreateTicketForm from "./components/tickets/CreateTicketForm";
 import TicketDetail from "./components/tickets/TicketDetail";
 
@@ -147,10 +147,9 @@ function App() {
               />
               <Route
                 path="profile"
-                path="resources"
                 element={
                   <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
-                    <Profile />
+                    <UserProfile />
                   </ProtectedRoute>
                 }
               />
@@ -158,7 +157,7 @@ function App() {
                 path="resources"
                 element={
                   <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
-                    <ResourceManagement />
+                    <ResourceListPage />
                   </ProtectedRoute>
                 }
               />
@@ -363,7 +362,7 @@ function App() {
             </Route>
 
             {/* Shared Dashboard Routes */}
-            <Route path="profile" element={<Profile />} />
+            <Route path="profile" element={<GeneralProfile />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 
