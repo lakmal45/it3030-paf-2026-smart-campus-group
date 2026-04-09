@@ -59,7 +59,9 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
+    }<<<<<<<<<
+
+    Temporary merge branch 1=========
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -118,5 +120,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID"));
 
         return http.build();
-    }
+    }>>>>>>>>>
+
+    Temporary merge branch 2
 }
