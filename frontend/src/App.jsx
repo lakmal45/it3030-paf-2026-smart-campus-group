@@ -26,7 +26,6 @@ import TechnicianDashboard from "./pages/technician/TechnicianDashboard";
 import MyBookings from "./pages/user/MyBookings";
 import CreateBooking from "./pages/user/CreateBooking";
 import MyTickets from "./pages/user/MyTickets";
-import UserProfile from "./pages/user/Profile";
 import CreateTicketForm from "./components/tickets/CreateTicketForm";
 import TicketDetail from "./components/tickets/TicketDetail";
 
@@ -146,18 +145,36 @@ function App() {
                 }
               />
               <Route
-                path="profile"
+                path="resources"
                 element={
-                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
-                    <UserProfile />
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "USER",
+                      "ROLE_USER",
+                      "ADMIN",
+                      "ROLE_ADMIN",
+                      "MANAGER",
+                      "ROLE_MANAGER",
+                    ]}
+                  >
+                    <ResourceListPage />
                   </ProtectedRoute>
                 }
               />
               <Route
                 path="resources"
                 element={
-                  <ProtectedRoute allowedRoles={["USER", "ROLE_USER"]}>
-                    <ResourceListPage />
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "USER",
+                      "ROLE_USER",
+                      "ADMIN",
+                      "ROLE_ADMIN",
+                      "MANAGER",
+                      "ROLE_MANAGER",
+                    ]}
+                  >
+                    <ResourceDetailPage />
                   </ProtectedRoute>
                 }
               />
