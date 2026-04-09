@@ -53,7 +53,11 @@ export const roleNavigation = {
       path: "/dashboard/manager/analytics",
       icon: BarChart,
     },
-    { name: "Maintenance", path: "/dashboard/manager/maintenance", icon: Wrench },
+    {
+      name: "Maintenance",
+      path: "/dashboard/manager/maintenance",
+      icon: Wrench,
+    },
     { name: "Resources", path: "/dashboard/manager/resources", icon: Box },
   ],
   TECHNICIAN: [
