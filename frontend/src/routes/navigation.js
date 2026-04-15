@@ -30,7 +30,6 @@ export const roleNavigation = {
       path: "/dashboard/user/tickets/new",
       icon: Wrench,
     },
-    { name: "Profile", path: "/dashboard/user/profile", icon: User },
     { name: "Resources", path: "/dashboard/user/resources", icon: Box },
   ],
   ADMIN: [

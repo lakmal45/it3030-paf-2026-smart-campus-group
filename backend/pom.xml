@@ -86,6 +86,13 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.5.0</version>
 		</dependency>
+
+		<!-- ── Email (MailerSend REST API SDK) ───────────────────────────────── -->
+		<dependency>
+			<groupId>com.mailersend</groupId>
+			<artifactId>java-sdk</artifactId>
+			<version>1.4.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
