@@ -168,6 +168,10 @@ public class TicketService {
         IncidentTicket updated = ticketRepository.save(ticket);
         log.info("Ticket #{} status changed: {} → {} by '{}'",
                 id, current, next, currentUser.getEmail());
+
+        // Notify the ticket creator about the status change
+        emailService.notifyStatusChange(updated, current);
+
         return mapToResponse(updated);
     }
 
@@ -263,6 +267,16 @@ public class TicketService {
         TicketComment saved = commentRepository.save(comment);
         log.info("Comment #{} added to ticket #{} by '{}'",
                 saved.getId(), ticketId, currentUser.getEmail());
+
+        // Notify the ticket creator when an admin, manager, or technician adds a comment
+        boolean isAdminOrManager = currentUser.getRole() == Role.ADMIN
+                || currentUser.getRole() == Role.MANAGER
+                || currentUser.getRole() == Role.TECHNICIAN;
+        if (isAdminOrManager && ticket.getCreatedBy() != null
+                && !ticket.getCreatedBy().getId().equals(currentUser.getId())) {
+            emailService.notifyCommentAdded(ticket, saved, currentUser);
+        }
+
         return mapToCommentResponse(saved);
     }
 

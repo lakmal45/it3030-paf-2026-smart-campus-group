@@ -341,4 +341,73 @@ public final class EmailTemplates {
                 ticket.getDescription()
         );
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Admin / Manager Comment Added
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Builds the HTML email body sent to the ticket creator when an admin or
+     * manager posts a comment on their ticket.
+     *
+     * @param ticket    the ticket that received the comment
+     * @param comment   the newly added comment
+     * @param commenter the admin/manager who wrote the comment
+     * @return HTML string
+     */
+    public static String commentAdded(IncidentTicket ticket,
+                                      com.project.paf.ticket.TicketComment comment,
+                                      User commenter) {
+        String badgeClass = switch (ticket.getStatus()) {
+            case IN_PROGRESS -> "badge-progress";
+            case RESOLVED    -> "badge-resolved";
+            case CLOSED      -> "badge-closed";
+            case REJECTED    -> "badge-rejected";
+            default          -> "badge-open";
+        };
+
+        return """
+                <!DOCTYPE html><html><head>%s</head><body>
+                <div class="wrapper">
+                  <div class="header">
+                    <h1>💬 New Comment on Your Ticket</h1>
+                    <p>Maintenance &amp; Incident Tracking System</p>
+                  </div>
+                  <div class="body">
+                    <p>Hi <strong>%s</strong>,</p>
+                    <p><strong>%s</strong> (Support Team) has left a comment on your ticket
+                       <strong>#%d</strong>.</p>
+                    <div class="ticket-card" style="border-left-color:#7c3aed;background:#f5f3ff;">
+                      <table>
+                        <tr><td>Ticket ID</td><td><strong>#%d</strong></td></tr>
+                        <tr><td>Category</td><td>%s</td></tr>
+                        <tr><td>Location</td><td>%s</td></tr>
+                        <tr><td>Current Status</td><td><span class="badge %s">%s</span></td></tr>
+                      </table>
+                    </div>
+                    <p style="font-size:13px;color:#6b7280;margin:0 0 6px;">Comment:</p>
+                    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;
+                                padding:16px 20px;margin-bottom:20px;">
+                      <p style="margin:0;font-size:15px;color:#111827;white-space:pre-wrap;">%s</p>
+                    </div>
+                    <p>Log in to the Smart Campus portal to view the full conversation and
+                       provide any additional information if needed.</p>
+                  </div>
+                  <div class="footer">
+                    <p>Smart Campus · IT3030 Project · This is an automated notification — please do not reply.</p>
+                  </div>
+                </div>
+                </body></html>
+                """.formatted(
+                STYLE,
+                ticket.getCreatedBy().getName(),
+                commenter.getName(),
+                ticket.getId(),
+                ticket.getId(),
+                ticket.getCategory(),
+                ticket.getLocation(),
+                badgeClass, ticket.getStatus().name(),
+                comment.getContent()
+        );
+    }
 }

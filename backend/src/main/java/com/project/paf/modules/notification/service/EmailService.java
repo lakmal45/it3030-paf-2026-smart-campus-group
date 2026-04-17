@@ -203,15 +203,46 @@ public class EmailService {
                 String subject = "🚨 New Ticket #" + ticket.getId() + " Reported — Smart Campus";
                 String html = EmailTemplates.adminNewTicket(ticket);
                 sendHtmlEmail(to, name, subject, html);
-                
+
                 // Create in-app notification
                 appNotificationService.createNotification(user,
                     "New Ticket Reported",
                     "A new ticket #" + ticket.getId() + " has been reported by " + ticket.getCreatedBy().getName() + ".",
                     "alert");
-                    
+
                 log.info("New ticket notification queued for admin/manager '{}'", to);
             }
         }
+    }
+
+    /**
+     * Notifies the ticket creator that an admin or manager has added a comment
+     * to their ticket.
+     *
+     * @param ticket    the ticket that received the comment
+     * @param comment   the newly added {@link com.project.paf.ticket.TicketComment}
+     * @param commenter the admin/manager who wrote the comment
+     */
+    @Async("emailTaskExecutor")
+    public void notifyCommentAdded(IncidentTicket ticket,
+                                   com.project.paf.ticket.TicketComment comment,
+                                   User commenter) {
+        if (ticket.getCreatedBy() == null || ticket.getCreatedBy().getEmail() == null) {
+            log.warn("Cannot send comment-added email: no creator email for ticket #{}", ticket.getId());
+            return;
+        }
+        String to      = ticket.getCreatedBy().getEmail();
+        String name    = ticket.getCreatedBy().getName();
+        String subject = "💬 New Comment on Ticket #" + ticket.getId() + " — Smart Campus";
+        String html    = EmailTemplates.commentAdded(ticket, comment, commenter);
+        sendHtmlEmail(to, name, subject, html);
+
+        // Create in-app notification for the ticket creator
+        appNotificationService.createNotification(ticket.getCreatedBy(),
+            "New Comment on Your Ticket",
+            commenter.getName() + " commented on your ticket #" + ticket.getId() + ".",
+            "info");
+
+        log.info("Comment-added notification queued for '{}' (ticket #{})", to, ticket.getId());
     }
 }
