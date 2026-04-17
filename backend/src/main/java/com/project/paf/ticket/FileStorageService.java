@@ -21,6 +21,7 @@ import java.util.UUID;
 /**
  * Service for handling image uploads, applying compression, and storing images in Supabase Storage.
  */
+@SuppressWarnings("null")
 @Service
 public class FileStorageService {
 

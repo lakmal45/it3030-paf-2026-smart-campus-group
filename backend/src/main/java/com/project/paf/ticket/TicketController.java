@@ -22,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.project.paf.modules.user.model.Role;
 import com.project.paf.modules.user.model.User;
 import com.project.paf.modules.user.repository.UserRepository;
-
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
