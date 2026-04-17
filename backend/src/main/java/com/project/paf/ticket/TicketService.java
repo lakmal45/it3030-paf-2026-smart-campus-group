@@ -239,7 +239,7 @@ public class TicketService {
         }
 
         IncidentTicket ticket = findTicketOrThrow(ticketId);
-        User technician = userRepository.findById(technicianId)
+        User technician = userRepository.findById(Objects.requireNonNull(technicianId))
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Technician not found with id: " + technicianId));
 
@@ -400,12 +400,12 @@ public class TicketService {
     // ─────────────────────────────────────────────────────────────────────────
 
     private IncidentTicket findTicketOrThrow(Long id) {
-        return ticketRepository.findById(id)
+        return ticketRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + id));
     }
 
     private TicketComment findCommentOrThrow(Long id) {
-        return commentRepository.findById(id)
+        return commentRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + id));
     }
 
