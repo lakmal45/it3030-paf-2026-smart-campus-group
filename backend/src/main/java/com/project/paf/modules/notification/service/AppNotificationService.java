@@ -33,7 +33,14 @@ public class AppNotificationService {
     @Async("emailTaskExecutor")
     public void createNotification(User targetUser, String title, String message, String type) {
         if (targetUser == null) return;
-        
+
+        // Respect the user's push notification preference
+        if (!targetUser.isPushNotificationsEnabled()) {
+            log.info("Push notifications disabled for user ID {}; skipping in-app notification: {}",
+                    targetUser.getId(), title);
+            return;
+        }
+
         Notification notification = new Notification();
         notification.setTargetUser(targetUser);
         notification.setTitle(title);

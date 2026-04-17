@@ -66,6 +66,14 @@ public class UserService {
         repo.save(user);
     }
 
+    public User updateNotificationPrefs(Long id, Boolean emailNotificationsEnabled, Boolean pushNotificationsEnabled) {
+        User user = repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        // Only update fields that were explicitly provided
+        if (emailNotificationsEnabled != null) user.setEmailNotificationsEnabled(emailNotificationsEnabled);
+        if (pushNotificationsEnabled != null) user.setPushNotificationsEnabled(pushNotificationsEnabled);
+        return repo.save(user);
+    }
+
     public void deleteUser(Long id) {
         repo.deleteById(id);
     }

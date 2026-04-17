@@ -42,28 +42,41 @@ const STATUS_COLOR = {
 // ─── Full-page Loader ──────────────────────────────────────────────────────────
 
 const PageLoader = () => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] gap-5 animate-fade-in-up">
-    <div className="relative w-16 h-16">
-      <div className="absolute inset-0 rounded-full border-4 border-indigo-100" />
-      <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-500 animate-spin-smooth" />
-      <div
-        className="absolute inset-2 rounded-full border-4 border-transparent border-t-violet-400 animate-spin-smooth"
-        style={{ animationDuration: '0.55s', animationDirection: 'reverse' }}
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '20px' }}>
+    <style>{`
+      @keyframes admin-spin { to { transform: rotate(360deg); } }
+      @keyframes admin-dash {
+        0%   { stroke-dashoffset: 220; }
+        50%  { stroke-dashoffset: 55; }
+        100% { stroke-dashoffset: 220; }
+      }
+
+    `}</style>
+
+    {/* SVG circle spinner */}
+    <svg
+      width="64" height="64" viewBox="0 0 64 64"
+      style={{ animation: 'admin-spin 2s linear infinite' }}
+    >
+      {/* Track */}
+      <circle cx="32" cy="32" r="28" fill="none" stroke="#e0e7ff" strokeWidth="5" />
+      {/* Animated arc */}
+      <circle
+        cx="32" cy="32" r="28"
+        fill="none"
+        stroke="#6366f1"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeDasharray="220"
+        style={{ animation: 'admin-dash 1.8s ease-in-out infinite', transformOrigin: 'center' }}
       />
+    </svg>
+
+    <div style={{ textAlign: 'center' }}>
+      <p style={{ color: '#1e293b', fontWeight: 600, fontSize: '1.1rem', margin: 0 }}>Loading admin dashboard</p>
+      <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginTop: '4px' }}>Fetching system data…</p>
     </div>
-    <div className="text-center">
-      <p className="text-slate-700 font-semibold text-lg">Loading admin dashboard</p>
-      <p className="text-slate-400 text-sm mt-1">Fetching system data…</p>
-    </div>
-    <div className="flex gap-1.5">
-      {[0, 1, 2].map(i => (
-        <span
-          key={i}
-          className="w-2 h-2 rounded-full bg-indigo-400"
-          style={{ animation: `ping-slow 1.4s ease-in-out ${i * 0.22}s infinite` }}
-        />
-      ))}
-    </div>
+
   </div>
 );
 

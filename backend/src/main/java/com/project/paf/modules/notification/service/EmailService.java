@@ -115,18 +115,23 @@ public class EmailService {
             log.warn("Cannot send ticket-created email: no creator email for ticket #{}", ticket.getId());
             return;
         }
+
+        // Create in-app notification (always)
+        appNotificationService.createNotification(ticket.getCreatedBy(),
+            "Ticket Received",
+            "Your ticket #" + ticket.getId() + " has been received.",
+            "info");
+
+        // Only send email if user has email notifications enabled
+        if (!ticket.getCreatedBy().isEmailNotificationsEnabled()) {
+            log.info("Email notifications disabled for '{}'; skipping ticket-created email", ticket.getCreatedBy().getEmail());
+            return;
+        }
         String to      = ticket.getCreatedBy().getEmail();
         String name    = ticket.getCreatedBy().getName();
         String subject = "🎫 Ticket #" + ticket.getId() + " Received — Smart Campus";
         String html    = EmailTemplates.ticketCreated(ticket);
         sendHtmlEmail(to, name, subject, html);
-        
-        // Create in-app notification
-        appNotificationService.createNotification(ticket.getCreatedBy(), 
-            "Ticket Received", 
-            "Your ticket #" + ticket.getId() + " has been received.", 
-            "info");
-            
         log.info("Ticket-created notification queued for '{}'", to);
     }
 
@@ -142,19 +147,24 @@ public class EmailService {
             log.warn("Cannot send status-change email: no creator email for ticket #{}", ticket.getId());
             return;
         }
+
+        // Create in-app notification (always)
+        appNotificationService.createNotification(ticket.getCreatedBy(),
+            "Ticket Status Updated",
+            "Ticket #" + ticket.getId() + " status changed to " + ticket.getStatus().name() + ".",
+            "warning");
+
+        // Only send email if user has email notifications enabled
+        if (!ticket.getCreatedBy().isEmailNotificationsEnabled()) {
+            log.info("Email notifications disabled for '{}'; skipping status-change email", ticket.getCreatedBy().getEmail());
+            return;
+        }
         String to      = ticket.getCreatedBy().getEmail();
         String name    = ticket.getCreatedBy().getName();
         String subject = "🔔 Ticket #" + ticket.getId() + " Status Updated → "
                          + ticket.getStatus().name() + " — Smart Campus";
         String html    = EmailTemplates.statusChanged(ticket, oldStatus.name());
         sendHtmlEmail(to, name, subject, html);
-        
-        // Create in-app notification
-        appNotificationService.createNotification(ticket.getCreatedBy(), 
-            "Ticket Status Updated", 
-            "Ticket #" + ticket.getId() + " status changed to " + ticket.getStatus().name() + ".", 
-            "warning");
-            
         log.info("Status-change notification queued for '{}' (#{}: {} → {})",
                 to, ticket.getId(), oldStatus, ticket.getStatus());
     }
@@ -172,18 +182,23 @@ public class EmailService {
                     ticket.getId());
             return;
         }
+
+        // Create in-app notification (always)
+        appNotificationService.createNotification(technician,
+            "New Ticket Assigned",
+            "You have been assigned to ticket #" + ticket.getId() + ".",
+            "info");
+
+        // Only send email if technician has email notifications enabled
+        if (!technician.isEmailNotificationsEnabled()) {
+            log.info("Email notifications disabled for '{}'; skipping technician-assigned email", technician.getEmail());
+            return;
+        }
         String to      = technician.getEmail();
         String name    = technician.getName();
         String subject = "🔧 New Assignment: Ticket #" + ticket.getId() + " — Smart Campus";
         String html    = EmailTemplates.technicianAssigned(ticket, technician);
         sendHtmlEmail(to, name, subject, html);
-        
-        // Create in-app notification
-        appNotificationService.createNotification(technician,
-            "New Ticket Assigned",
-            "You have been assigned to ticket #" + ticket.getId() + ".",
-            "info");
-            
         log.info("Technician-assigned notification queued for '{}' (ticket #{})",
                 to, ticket.getId());
     }
@@ -197,21 +212,25 @@ public class EmailService {
     @Async("emailTaskExecutor")
     public void notifyAdminsAndManagersNewTicket(IncidentTicket ticket, List<User> adminsAndManagers) {
         for (User user : adminsAndManagers) {
-            if (user.getEmail() != null) {
-                String to = user.getEmail();
-                String name = user.getName();
-                String subject = "🚨 New Ticket #" + ticket.getId() + " Reported — Smart Campus";
-                String html = EmailTemplates.adminNewTicket(ticket);
-                sendHtmlEmail(to, name, subject, html);
+            if (user.getEmail() == null) continue;
 
-                // Create in-app notification
-                appNotificationService.createNotification(user,
-                    "New Ticket Reported",
-                    "A new ticket #" + ticket.getId() + " has been reported by " + ticket.getCreatedBy().getName() + ".",
-                    "alert");
+            // Create in-app notification (always, regardless of email preference)
+            appNotificationService.createNotification(user,
+                "New Ticket Reported",
+                "A new ticket #" + ticket.getId() + " has been reported by " + ticket.getCreatedBy().getName() + ".",
+                "alert");
 
-                log.info("New ticket notification queued for admin/manager '{}'", to);
+            // Only send email if this admin/manager has email notifications enabled
+            if (!user.isEmailNotificationsEnabled()) {
+                log.info("Email notifications disabled for '{}'; skipping new-ticket admin email", user.getEmail());
+                continue;
             }
+            String to      = user.getEmail();
+            String name    = user.getName();
+            String subject = "🚨 New Ticket #" + ticket.getId() + " Reported — Smart Campus";
+            String html    = EmailTemplates.adminNewTicket(ticket);
+            sendHtmlEmail(to, name, subject, html);
+            log.info("New ticket notification queued for admin/manager '{}'", to);
         }
     }
 
@@ -231,18 +250,23 @@ public class EmailService {
             log.warn("Cannot send comment-added email: no creator email for ticket #{}", ticket.getId());
             return;
         }
-        String to      = ticket.getCreatedBy().getEmail();
-        String name    = ticket.getCreatedBy().getName();
-        String subject = "💬 New Comment on Ticket #" + ticket.getId() + " — Smart Campus";
-        String html    = EmailTemplates.commentAdded(ticket, comment, commenter);
-        sendHtmlEmail(to, name, subject, html);
 
-        // Create in-app notification for the ticket creator
+        // Create in-app notification for the ticket creator (always)
         appNotificationService.createNotification(ticket.getCreatedBy(),
             "New Comment on Your Ticket",
             commenter.getName() + " commented on your ticket #" + ticket.getId() + ".",
             "info");
 
+        // Only send email if user has email notifications enabled
+        if (!ticket.getCreatedBy().isEmailNotificationsEnabled()) {
+            log.info("Email notifications disabled for '{}'; skipping comment-added email", ticket.getCreatedBy().getEmail());
+            return;
+        }
+        String to      = ticket.getCreatedBy().getEmail();
+        String name    = ticket.getCreatedBy().getName();
+        String subject = "💬 New Comment on Ticket #" + ticket.getId() + " — Smart Campus";
+        String html    = EmailTemplates.commentAdded(ticket, comment, commenter);
+        sendHtmlEmail(to, name, subject, html);
         log.info("Comment-added notification queued for '{}' (ticket #{})", to, ticket.getId());
     }
 }
