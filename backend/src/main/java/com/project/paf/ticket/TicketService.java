@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,7 +89,7 @@ public class TicketService {
         IncidentTicket ticket = findTicketOrThrow(id);
 
         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
-        boolean isCreator = ticket.getCreatedBy().getId().equals(currentUser.getId());
+        boolean isCreator = ticket.getCreatedBy() != null && Objects.equals(ticket.getCreatedBy().getId(), currentUser.getId());
         boolean isOpen = ticket.getStatus() == TicketStatus.OPEN;
 
         if (!isAdmin && !(isCreator && isOpen)) {
@@ -238,7 +239,7 @@ public class TicketService {
         }
 
         IncidentTicket ticket = findTicketOrThrow(ticketId);
-        User technician = userRepository.findById(technicianId)
+        User technician = userRepository.findById(Objects.requireNonNull(technicianId))
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Technician not found with id: " + technicianId));
 
@@ -299,7 +300,7 @@ public class TicketService {
         IncidentTicket ticket = findTicketOrThrow(id);
         
         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
-        boolean isCreator = ticket.getCreatedBy().getId().equals(currentUser.getId());
+        boolean isCreator = ticket.getCreatedBy() != null && Objects.equals(ticket.getCreatedBy().getId(), currentUser.getId());
         boolean isOpen = ticket.getStatus() == TicketStatus.OPEN;
 
         if (!isAdmin && !(isCreator && isOpen)) {
@@ -399,17 +400,17 @@ public class TicketService {
     // ─────────────────────────────────────────────────────────────────────────
 
     private IncidentTicket findTicketOrThrow(Long id) {
-        return ticketRepository.findById(id)
+        return ticketRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + id));
     }
 
     private TicketComment findCommentOrThrow(Long id) {
-        return commentRepository.findById(id)
+        return commentRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + id));
     }
 
     private void assertOwnerOrAdmin(User author, User currentUser, String action) {
-        boolean isOwner = author.getId().equals(currentUser.getId());
+        boolean isOwner = author != null && Objects.equals(author.getId(), currentUser.getId());
         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
         if (!isOwner && !isAdmin) {
             throw new AccessDeniedException(

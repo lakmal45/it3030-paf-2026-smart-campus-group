@@ -77,6 +77,7 @@ public class TicketServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void createTicket_ShouldSetStatusToOpen() {
         log.info("Running createTicket_ShouldSetStatusToOpen...");
         CreateTicketRequest request = new CreateTicketRequest();
@@ -98,6 +99,7 @@ public class TicketServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void updateTicketStatus_ValidTransition_ShouldSucceed() {
         log.info("Running updateTicketStatus_ValidTransition_ShouldSucceed...");
         UpdateTicketStatusRequest request = new UpdateTicketStatusRequest();
@@ -114,6 +116,7 @@ public class TicketServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void updateTicketStatus_InvalidTransition_ShouldThrowIllegalStateException() {
         log.info("Running updateTicketStatus_InvalidTransition_ShouldThrowIllegalStateException...");
         openTicket.setStatus(TicketStatus.CLOSED);
@@ -134,6 +137,22 @@ public class TicketServiceTest {
         request.setStatus(TicketStatus.IN_PROGRESS);
 
         assertThrows(AccessDeniedException.class, () -> ticketService.updateTicketStatus(10L, request, regularUser));
+    }
+
+    @Test
+    @SuppressWarnings("null")
+    void assignTechnician_ShouldSetStatusToInProgress_WhenCurrentlyOpen() {
+        log.info("Running assignTechnician_ShouldSetStatusToInProgress_WhenCurrentlyOpen...");
+        
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(openTicket));
+        when(userRepository.findById(3L)).thenReturn(Optional.of(technicianUser));
+        when(ticketRepository.save(any(IncidentTicket.class))).thenReturn(openTicket);
+
+        TicketResponse response = ticketService.assignTechnician(10L, 3L, adminUser);
+
+        assertEquals(TicketStatus.IN_PROGRESS, response.getStatus());
+        assertEquals(technicianUser.getId(), response.getAssignedTechnicianId());
+        verify(notificationService, times(1)).sendNotification(eq(technicianUser), anyString(), eq("TICKET_UPDATE"));
     }
 
     @Test
@@ -160,6 +179,7 @@ public class TicketServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void addComment_ShouldTriggerNotification_WhenCommenterIsNotOwner() {
         log.info("Running addComment_ShouldTriggerNotification_WhenCommenterIsNotOwner...");
         CommentRequest request = new CommentRequest();
@@ -185,8 +205,9 @@ public class TicketServiceTest {
     @Test
     void deleteTicket_ByNonAdmin_ShouldThrowAccessDeniedException() {
         log.info("Running deleteTicket_ByNonAdmin_ShouldThrowAccessDeniedException...");
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(openTicket));
 
-        assertThrows(AccessDeniedException.class, () -> ticketService.deleteTicket(10L, regularUser));
+        assertThrows(AccessDeniedException.class, () -> ticketService.deleteTicket(10L, technicianUser));
     }
 
     @Test
