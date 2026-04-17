@@ -1,10 +1,9 @@
 package com.project.paf.modules.notification.service;
 
-import com.mailersend.sdk.emails.Email;
-import com.mailersend.sdk.MailerSend;
-import com.mailersend.sdk.MailerSendResponse;
-import com.mailersend.sdk.exceptions.MailerSendException;
-import com.project.paf.modules.notification.model.NotificationTemplates;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import com.project.paf.modules.notification.model.EmailTemplates;
 import com.project.paf.modules.user.model.User;
 import com.project.paf.ticket.IncidentTicket;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * Service responsible for sending all outbound notification emails
- * via the MailerSend REST API (Java SDK).
+ * via Spring Mail SMTP.
  *
  * <p>Using the API instead of SMTP removes trial-account recipient
  * restrictions and is more reliable overall.
@@ -30,8 +31,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    @Value("${mailersend.api-token}")
-    private String apiToken;
+    private final JavaMailSender mailSender;
+    private final AppNotificationService appNotificationService;
+
+    public EmailService(JavaMailSender mailSender, AppNotificationService appNotificationService) {
+        this.mailSender = mailSender;
+        this.appNotificationService = appNotificationService;
+    }
 
     @Value("${mailersend.from-address}")
     private String fromAddress;
@@ -54,27 +60,19 @@ public class EmailService {
     @Async("emailTaskExecutor")
     public void sendHtmlEmail(String to, String toName, String subject, String htmlContent) {
         try {
-            Email email = new Email();
-            email.setFrom(fromName, fromAddress);
-            email.addRecipient(toName, to);
-            email.setSubject(subject);
-            email.setHtml(htmlContent);
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            // Plain-text fallback (strip tags for simplicity)
-            email.setPlain(htmlContent.replaceAll("<[^>]*>", ""));
+            helper.setFrom(fromAddress, fromName);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
 
-            MailerSend ms = new MailerSend();
-            ms.setToken(apiToken);
+            mailSender.send(message);
+            log.info("Email sent via SMTP to '{}' | subject: '{}'", to, subject);
 
-            MailerSendResponse response = ms.emails().send(email);
-            log.info("Email sent via API to '{}' | subject: '{}' | messageId: {}",
-                    to, subject, response.messageId);
-
-        } catch (MailerSendException e) {
-            log.error("MailerSend API error sending to '{}': code={} body={}",
-                    to, e.code, e.getMessage());
         } catch (Exception e) {
-            log.error("Unexpected error sending email to '{}': {}", to, e.getMessage());
+            log.error("Unexpected error sending SMTP email to '{}': {}", to, e.getMessage(), e);
         }
     }
 
@@ -97,7 +95,7 @@ public class EmailService {
             return;
         }
         String subject = "👋 Welcome to Smart Campus, " + name + "!";
-        String html    = NotificationTemplates.welcomeEmail(name, email, isGoogleSignup);
+        String html    = EmailTemplates.welcomeEmail(name, email, isGoogleSignup);
         sendHtmlEmail(email, name, subject, html);
         log.info("Welcome notification queued for '{}' (Google={})", email, isGoogleSignup);
     }
@@ -120,8 +118,15 @@ public class EmailService {
         String to      = ticket.getCreatedBy().getEmail();
         String name    = ticket.getCreatedBy().getName();
         String subject = "🎫 Ticket #" + ticket.getId() + " Received — Smart Campus";
-        String html    = NotificationTemplates.ticketCreated(ticket);
+        String html    = EmailTemplates.ticketCreated(ticket);
         sendHtmlEmail(to, name, subject, html);
+        
+        // Create in-app notification
+        appNotificationService.createNotification(ticket.getCreatedBy(), 
+            "Ticket Received", 
+            "Your ticket #" + ticket.getId() + " has been received.", 
+            "info");
+            
         log.info("Ticket-created notification queued for '{}'", to);
     }
 
@@ -141,8 +146,15 @@ public class EmailService {
         String name    = ticket.getCreatedBy().getName();
         String subject = "🔔 Ticket #" + ticket.getId() + " Status Updated → "
                          + ticket.getStatus().name() + " — Smart Campus";
-        String html    = NotificationTemplates.statusChanged(ticket, oldStatus.name());
+        String html    = EmailTemplates.statusChanged(ticket, oldStatus.name());
         sendHtmlEmail(to, name, subject, html);
+        
+        // Create in-app notification
+        appNotificationService.createNotification(ticket.getCreatedBy(), 
+            "Ticket Status Updated", 
+            "Ticket #" + ticket.getId() + " status changed to " + ticket.getStatus().name() + ".", 
+            "warning");
+            
         log.info("Status-change notification queued for '{}' (#{}: {} → {})",
                 to, ticket.getId(), oldStatus, ticket.getStatus());
     }
@@ -163,9 +175,43 @@ public class EmailService {
         String to      = technician.getEmail();
         String name    = technician.getName();
         String subject = "🔧 New Assignment: Ticket #" + ticket.getId() + " — Smart Campus";
-        String html    = NotificationTemplates.technicianAssigned(ticket, technician);
+        String html    = EmailTemplates.technicianAssigned(ticket, technician);
         sendHtmlEmail(to, name, subject, html);
+        
+        // Create in-app notification
+        appNotificationService.createNotification(technician,
+            "New Ticket Assigned",
+            "You have been assigned to ticket #" + ticket.getId() + ".",
+            "info");
+            
         log.info("Technician-assigned notification queued for '{}' (ticket #{})",
                 to, ticket.getId());
+    }
+
+    /**
+     * Notifies all admins and managers when a new ticket is submitted.
+     *
+     * @param ticket            the newly created ticket
+     * @param adminsAndManagers the list of User entities with ADMIN or MANAGER roles
+     */
+    @Async("emailTaskExecutor")
+    public void notifyAdminsAndManagersNewTicket(IncidentTicket ticket, List<User> adminsAndManagers) {
+        for (User user : adminsAndManagers) {
+            if (user.getEmail() != null) {
+                String to = user.getEmail();
+                String name = user.getName();
+                String subject = "🚨 New Ticket #" + ticket.getId() + " Reported — Smart Campus";
+                String html = EmailTemplates.adminNewTicket(ticket);
+                sendHtmlEmail(to, name, subject, html);
+                
+                // Create in-app notification
+                appNotificationService.createNotification(user,
+                    "New Ticket Reported",
+                    "A new ticket #" + ticket.getId() + " has been reported by " + ticket.getCreatedBy().getName() + ".",
+                    "alert");
+                    
+                log.info("New ticket notification queued for admin/manager '{}'", to);
+            }
+        }
     }
 }

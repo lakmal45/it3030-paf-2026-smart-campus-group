@@ -9,9 +9,9 @@ import com.project.paf.modules.user.model.User;
  * <p>All methods are static — this class is not instantiated by Spring;
  * it exists purely as a template factory for the {@link com.project.paf.modules.notification.service.EmailService}.
  */
-public final class NotificationTemplates {
+public final class EmailTemplates {
 
-    private NotificationTemplates() {}
+    private EmailTemplates() {}
 
     // ─────────────────────────────────────────────────────────────────────────
     // Shared styles
@@ -286,6 +286,55 @@ public final class NotificationTemplates {
                 technician.getName(),
                 ticket.getId(),
                 ticket.getCreatedBy().getName(),
+                ticket.getCategory(),
+                ticket.getLocation(),
+                ticket.getPriority(),
+                ticket.getDescription()
+        );
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Admin / Manager New Ticket
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Builds the HTML email body sent to admins and managers when a new ticket is created.
+     *
+     * @param ticket the newly created incident ticket
+     * @return HTML string
+     */
+    public static String adminNewTicket(IncidentTicket ticket) {
+        return """
+                <!DOCTYPE html><html><head>%s</head><body>
+                <div class="wrapper">
+                  <div class="header">
+                    <h1>🚨 New Ticket Reported</h1>
+                    <p>Maintenance &amp; Incident Tracking System</p>
+                  </div>
+                  <div class="body">
+                    <p>Hello Admin/Manager,</p>
+                    <p>A new incident report has been submitted by <strong>%s</strong>.</p>
+                    <div class="ticket-card">
+                      <table>
+                        <tr><td>Ticket ID</td><td><strong>#%d</strong></td></tr>
+                        <tr><td>Category</td><td>%s</td></tr>
+                        <tr><td>Location</td><td>%s</td></tr>
+                        <tr><td>Priority</td><td>%s</td></tr>
+                        <tr><td>Status</td><td><span class="badge badge-open">OPEN</span></td></tr>
+                        <tr><td>Description</td><td>%s</td></tr>
+                      </table>
+                    </div>
+                    <p>Please log in to the Smart Campus portal to review and assign a technician.</p>
+                  </div>
+                  <div class="footer">
+                    <p>Smart Campus · IT3030 Project · This is an automated notification — please do not reply.</p>
+                  </div>
+                </div>
+                </body></html>
+                """.formatted(
+                STYLE,
+                ticket.getCreatedBy().getName(),
+                ticket.getId(),
                 ticket.getCategory(),
                 ticket.getLocation(),
                 ticket.getPriority(),

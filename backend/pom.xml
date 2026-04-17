@@ -87,11 +87,10 @@
 			<version>2.5.0</version>
 		</dependency>
 
-		<!-- ── Email (MailerSend REST API SDK) ───────────────────────────────── -->
+		<!-- ── Email (Spring Boot Starter Mail) ───────────────────────────────── -->
 		<dependency>
-			<groupId>com.mailersend</groupId>
-			<artifactId>java-sdk</artifactId>
-			<version>1.4.1</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 	</dependencies>
 

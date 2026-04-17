@@ -15,12 +15,16 @@ import Settings from "./pages/Settings";
 // Layout & Protection
 import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./components/RoleProtectedRoute";
+import { NotificationProvider } from "./context/NotificationContext";
 
 // Dashboards
 import UserDashboard from "./pages/user/UserDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
 import TechnicianDashboard from "./pages/technician/TechnicianDashboard";
+
+// Notifications
+import NotificationsPage from "./pages/NotificationsPage";
 
 // User Pages
 import MyBookings from "./pages/user/MyBookings";
@@ -73,7 +77,8 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
+        <NotificationProvider>
+          <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -381,6 +386,7 @@ function App() {
             {/* Shared Dashboard Routes */}
             <Route path="profile" element={<GeneralProfile />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="notifications" element={<NotificationsPage />} />
           </Route>
 
           {/* Fallback Unauthorized/Not Found */}
@@ -394,6 +400,7 @@ function App() {
           />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+        </NotificationProvider>
       </AuthProvider>
     </BrowserRouter>
   );

@@ -4,6 +4,7 @@ import com.project.paf.modules.resource.exception.ResourceNotFoundException;
 import com.project.paf.modules.user.model.Role;
 import com.project.paf.modules.user.model.User;
 import com.project.paf.modules.user.repository.UserRepository;
+import com.project.paf.modules.notification.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -33,15 +34,18 @@ public class TicketService {
     private final TicketCommentRepository commentRepository;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     public TicketService(TicketRepository ticketRepository,
                          TicketCommentRepository commentRepository,
                          FileStorageService fileStorageService,
-                         UserRepository userRepository) {
+                         UserRepository userRepository,
+                         EmailService emailService) {
         this.ticketRepository = ticketRepository;
         this.commentRepository = commentRepository;
         this.fileStorageService = fileStorageService;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -68,6 +72,14 @@ public class TicketService {
 
         IncidentTicket saved = ticketRepository.save(ticket);
         log.info("Ticket #{} created by user '{}'", saved.getId(), currentUser.getEmail());
+
+        // Notify the user who created the ticket
+        emailService.notifyTicketCreated(saved);
+
+        // Notify all admins and managers
+        List<User> adminsAndManagers = userRepository.findByRoleIn(List.of(Role.ADMIN, Role.MANAGER));
+        emailService.notifyAdminsAndManagersNewTicket(saved, adminsAndManagers);
+
         return mapToResponse(saved);
     }
 
