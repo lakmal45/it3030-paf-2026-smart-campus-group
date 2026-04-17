@@ -15,6 +15,7 @@ import Settings from "./pages/Settings";
 // Layout & Protection
 import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./components/RoleProtectedRoute";
+import { NotificationProvider } from "./context/NotificationContext";
 
 // Dashboards
 import UserDashboard from "./pages/user/UserDashboard";
@@ -23,6 +24,9 @@ import ManagerDashboard from "./pages/manager/ManagerDashboard";
 import TechnicianDashboard from "./pages/technician/TechnicianDashboard";
 import ResourceUserDashboard from "./pages/user/ResourceUserDashboard";
 import ResourceAdminDashboard from "./pages/admin/ResourceAdminDashboard";
+
+// Notifications
+import NotificationsPage from "./pages/NotificationsPage";
 
 // User Pages
 import MyBookings from "./pages/user/MyBookings";
@@ -34,7 +38,6 @@ import TicketDetail from "./components/tickets/TicketDetail";
 
 // Admin Pages
 import UserManagement from "./pages/admin/UserManagement";
-import RoleManagement from "./pages/admin/RoleManagement";
 import SystemSettings from "./pages/admin/SystemSettings";
 import AllTickets from "./pages/admin/AllTickets";
 import AllBookings from "./pages/admin/AllBookings";
@@ -77,26 +80,27 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/oauth-success" element={<OAuthSuccess />} />
+        <NotificationProvider>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/oauth-success" element={<OAuthSuccess />} />
 
-          {/* Root */}
-          <Route path="/" element={<Home />} />
+            {/* Root */}
+            <Route path="/" element={<Home />} />
 
-          {/* Protected Routes wrapped in Dashboard Layout */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          >
-            {/* The index route does the smart role redirection */}
-            <Route index element={<RoleBasedRedirect />} />
+            {/* Protected Routes wrapped in Dashboard Layout */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              {/* The index route does the smart role redirection */}
+              <Route index element={<RoleBasedRedirect />} />
 
             {/* User Routes */}
             <Route path="user">
@@ -245,14 +249,6 @@ function App() {
                 }
               />
               <Route
-                path="roles"
-                element={
-                  <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
-                    <RoleManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="settings"
                 element={
                   <ProtectedRoute allowedRoles={["ADMIN", "ROLE_ADMIN"]}>
@@ -394,60 +390,65 @@ function App() {
               />
             </Route>
 
-            {/* Technician Routes */}
-            <Route path="technician">
-              <Route
-                index
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
-                  >
-                    <TechnicianDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="tickets"
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
-                  >
-                    <AssignedTickets />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="tickets/:id"
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
-                  >
-                    <TicketDetail />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="update-status"
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
-                  >
-                    <UpdateStatus />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="history"
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
-                  >
-                    <History />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
+              {/* Technician Routes */}
+              <Route path="technician">
+                <Route
+                  index
+                  element={
+                    <ProtectedRoute
+                      allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
+                    >
+                      <TechnicianDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="tickets"
+                  element={
+                    <ProtectedRoute
+                      allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
+                    >
+                      <AssignedTickets />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="tickets/:id"
+                  element={
+                    <ProtectedRoute
+                      allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
+                    >
+                      <TicketDetail />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="update-status"
+                  element={
+                    <ProtectedRoute
+                      allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
+                    >
+                      <UpdateStatus />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="history"
+                  element={
+                    <ProtectedRoute
+                      allowedRoles={["TECHNICIAN", "ROLE_TECHNICIAN"]}
+                    >
+                      <History />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
 
+              {/* Shared Dashboard Routes */}
+              <Route path="profile" element={<GeneralProfile />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+            </Route>
             {/* Resource-Specific Dashboard Routes */}
             <Route
               path="user/resource-dashboard"
@@ -471,17 +472,18 @@ function App() {
             <Route path="settings" element={<Settings />} />
           </Route>
 
-          {/* Fallback Unauthorized/Not Found */}
-          <Route
-            path="/unauthorized"
-            element={
-              <div className="p-10 text-center text-red-600 font-bold">
-                Unauthorized Access
-              </div>
-            }
-          />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+            {/* Fallback Unauthorized/Not Found */}
+            <Route
+              path="/unauthorized"
+              element={
+                <div className="p-10 text-center text-red-600 font-bold">
+                  Unauthorized Access
+                </div>
+              }
+            />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </NotificationProvider>
       </AuthProvider>
     </BrowserRouter>
   );
