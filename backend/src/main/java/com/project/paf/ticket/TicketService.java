@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,6 @@ import java.util.stream.Collectors;
  *   <li>Image upload limits (max 3 per ticket).</li>
  * </ul>
  */
-@SuppressWarnings("null")
 @Slf4j
 @Service
 @Transactional
@@ -89,7 +89,7 @@ public class TicketService {
         IncidentTicket ticket = findTicketOrThrow(id);
 
         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
-        boolean isCreator = ticket.getCreatedBy().getId().equals(currentUser.getId());
+        boolean isCreator = ticket.getCreatedBy() != null && Objects.equals(ticket.getCreatedBy().getId(), currentUser.getId());
         boolean isOpen = ticket.getStatus() == TicketStatus.OPEN;
 
         if (!isAdmin && !(isCreator && isOpen)) {
@@ -300,7 +300,7 @@ public class TicketService {
         IncidentTicket ticket = findTicketOrThrow(id);
         
         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
-        boolean isCreator = ticket.getCreatedBy().getId().equals(currentUser.getId());
+        boolean isCreator = ticket.getCreatedBy() != null && Objects.equals(ticket.getCreatedBy().getId(), currentUser.getId());
         boolean isOpen = ticket.getStatus() == TicketStatus.OPEN;
 
         if (!isAdmin && !(isCreator && isOpen)) {
@@ -410,7 +410,7 @@ public class TicketService {
     }
 
     private void assertOwnerOrAdmin(User author, User currentUser, String action) {
-        boolean isOwner = author.getId().equals(currentUser.getId());
+        boolean isOwner = author != null && Objects.equals(author.getId(), currentUser.getId());
         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
         if (!isOwner && !isAdmin) {
             throw new AccessDeniedException(

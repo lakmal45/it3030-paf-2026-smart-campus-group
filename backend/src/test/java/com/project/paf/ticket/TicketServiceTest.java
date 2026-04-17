@@ -27,7 +27,6 @@ import static org.mockito.Mockito.*;
  */
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("null")
 public class TicketServiceTest {
 
     @Mock
@@ -135,6 +134,22 @@ public class TicketServiceTest {
         request.setStatus(TicketStatus.IN_PROGRESS);
 
         assertThrows(AccessDeniedException.class, () -> ticketService.updateTicketStatus(10L, request, regularUser));
+    }
+
+    @Test
+    void assignTechnician_ShouldSetStatusToInProgress_WhenCurrentlyOpen() {
+        log.info("Running assignTechnician_ShouldSetStatusToInProgress_WhenCurrentlyOpen...");
+        AssignTechnicianRequest request = new AssignTechnicianRequest();
+        
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(openTicket));
+        when(userRepository.findById(3L)).thenReturn(Optional.of(technicianUser));
+        when(ticketRepository.save(any(IncidentTicket.class))).thenReturn(openTicket);
+
+        TicketResponse response = ticketService.assignTechnician(10L, 3L, adminUser);
+
+        assertEquals(TicketStatus.IN_PROGRESS, response.getStatus());
+        assertEquals(technicianUser.getId(), response.getAssignedTechnicianId());
+        verify(notificationService, times(1)).sendNotification(eq(technicianUser), anyString(), eq("TICKET_UPDATE"));
     }
 
     @Test
