@@ -178,7 +178,6 @@ const AdminDashboard = () => {
       
       const workloadData = Object.entries(workloadMap).map(([name, count]) => ({ name, count }));
       setTechnicianWorkload(workloadData.sort((a,b) => b.count - a.count).slice(0, 5));
-
       setError(null);
     } catch (err) {
       console.error('AdminDashboard fetch error:', err);
@@ -317,7 +316,7 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {!refreshing && tickets.length > 0 && (
+          {!refreshing && tickets?.length > 0 && (
             <div className="flex flex-wrap gap-4 mt-4">
               {chartData.map(d => (
                 <div key={d.name} className="flex items-center gap-2">
