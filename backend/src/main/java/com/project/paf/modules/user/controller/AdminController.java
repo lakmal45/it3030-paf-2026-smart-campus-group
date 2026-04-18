@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("null")
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(originPatterns = "http://localhost:*")
@@ -90,7 +89,7 @@ public class AdminController {
 
         requireAdmin(session, emailHeader);
 
-        User user = repo.findById(id)
+        User user = repo.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         user.setRole(role);
@@ -105,7 +104,7 @@ public class AdminController {
             @RequestHeader(value = "X-User-Email", required = false) String emailHeader) {
 
         requireAdmin(session, emailHeader);
-        repo.deleteById(id);
+        repo.deleteById(java.util.Objects.requireNonNull(id));
         return ResponseEntity.noContent().build();
     }
 

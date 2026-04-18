@@ -137,7 +137,7 @@ public class TicketController {
         User currentUser = resolveUser(session, emailHeader);
         requireRoles(currentUser, Role.ADMIN);
         return ResponseEntity.ok(
-                ticketService.assignTechnician(id, request.getTechnicianId(), currentUser));
+                ticketService.assignTechnician(id, java.util.Objects.requireNonNull(request.getTechnicianId()), currentUser));
     }
 
     /**
