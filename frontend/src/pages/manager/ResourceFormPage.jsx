@@ -39,12 +39,14 @@ const ResourceFormPage = () => {
 
   const normalizedRole = user?.role?.toUpperCase() || "";
   const isAdmin = normalizedRole.includes("ADMIN");
+  const isManager = normalizedRole.includes("MANAGER");
   const isAuthorized = isAdmin;
 
   useEffect(() => {
     if (!isAuthorized && !isLoading) {
-      showToast("Access Denied: Management privileges required", "error");
-      navigate("/dashboard");
+      showToast("Access Denied: Administration privileges required", "error");
+      const redirectPath = isAdmin ? "/dashboard/admin" : isManager ? "/dashboard/manager" : "/dashboard/user";
+      navigate(redirectPath);
       return;
     }
 
@@ -72,7 +74,7 @@ const ResourceFormPage = () => {
       };
       fetchResource();
     }
-  }, [id, isEditMode, navigate, showToast, isAuthorized, isLoading]);
+  }, [id, isEditMode, navigate, showToast, isAuthorized, isLoading, isAdmin, isManager]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -119,10 +121,7 @@ const ResourceFormPage = () => {
       }
       
       // Navigate back to list based on role
-      let basePath = "/dashboard/user";
-      if (isAdmin) basePath = "/dashboard/admin";
-      else if (isManager) basePath = "/dashboard/manager";
-      
+      const basePath = isAdmin ? "/dashboard/admin" : isManager ? "/dashboard/manager" : "/dashboard/user";
       navigate(`${basePath}/resources`);
     } catch (err) {
       console.error("Save error:", err);
