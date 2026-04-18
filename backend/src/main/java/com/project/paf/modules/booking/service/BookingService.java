@@ -136,6 +136,7 @@ public class BookingService {
     /**
      * Delete a booking records permanently.
      */
+    @SuppressWarnings("null")
     public void deleteBooking(Long id) {
         if (!bookingRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found");
