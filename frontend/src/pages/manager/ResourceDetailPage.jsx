@@ -63,7 +63,8 @@ const ResourceDetailPage = () => {
       showToast("Resource deleted permanently", "success");
       const basePath = "/dashboard/admin";
       navigate(`${basePath}/resources`);
-    } catch (err) {
+    } catch (error) {
+      console.error("Error deleting resource:", error);
       showToast("Failed to delete resource. Please try again.", "error");
       setIsDeleting(false);
     }

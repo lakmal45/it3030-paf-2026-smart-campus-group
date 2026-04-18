@@ -17,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Index;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -29,7 +30,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "incident_tickets")
+@Table(name = "incident_tickets", indexes = {
+    @Index(name = "idx_status", columnList = "status"),
+    @Index(name = "idx_category", columnList = "category"),
+    @Index(name = "idx_priority", columnList = "priority"),
+    @Index(name = "idx_created_by", columnList = "created_by_id"),
+    @Index(name = "idx_assigned_technician", columnList = "assigned_technician_id")
+})
 public class IncidentTicket {
 
     @Id

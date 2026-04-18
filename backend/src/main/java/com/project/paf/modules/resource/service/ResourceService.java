@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@SuppressWarnings("null")
 @Service
 public class ResourceService {
 
@@ -51,7 +50,7 @@ public class ResourceService {
 
     public ResourceResponseDTO createResource(@Valid ResourceRequestDTO requestDTO) {
         Resource resource = toEntity(requestDTO);
-        Resource savedResource = resourceRepository.save(resource);
+        Resource savedResource = resourceRepository.save(java.util.Objects.requireNonNull(resource));
         return toResponseDTO(savedResource);
     }
 
@@ -67,7 +66,7 @@ public class ResourceService {
         existingResource.setStatus(requestDTO.getStatus());
         existingResource.setDescription(requestDTO.getDescription());
 
-        Resource updatedResource = resourceRepository.save(existingResource);
+        Resource updatedResource = resourceRepository.save(java.util.Objects.requireNonNull(existingResource));
         return toResponseDTO(updatedResource);
     }
 
@@ -84,14 +83,14 @@ public class ResourceService {
             existingResource.setAvailable(false);
         }
 
-        Resource updatedResource = resourceRepository.save(existingResource);
+        Resource updatedResource = resourceRepository.save(java.util.Objects.requireNonNull(existingResource));
         return toResponseDTO(updatedResource);
     }
 
     public void deleteResource(@NonNull Long id) {
         Resource existingResource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
-        resourceRepository.delete(existingResource);
+        resourceRepository.delete(java.util.Objects.requireNonNull(existingResource));
     }
 
     private Resource toEntity(ResourceRequestDTO requestDTO) {

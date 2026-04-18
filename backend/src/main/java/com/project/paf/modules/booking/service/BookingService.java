@@ -15,7 +15,6 @@ import java.util.List;
 
 @Service
 @Transactional
-@SuppressWarnings("null")
 public class BookingService {
 
     private final BookingRepository bookingRepository;
@@ -108,10 +107,10 @@ public class BookingService {
      * Delete a booking records permanently.
      */
     public void deleteBooking(Long id) {
-        if (!bookingRepository.existsById(id)) {
+        if (!bookingRepository.existsById(java.util.Objects.requireNonNull(id))) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found");
         }
-        bookingRepository.deleteById(id);
+        bookingRepository.deleteById(java.util.Objects.requireNonNull(id));
     }
 
     /**
