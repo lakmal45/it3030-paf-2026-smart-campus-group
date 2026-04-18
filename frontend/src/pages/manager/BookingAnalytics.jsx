@@ -111,7 +111,7 @@ const BookingAnalytics = () => {
       setEditingBooking(null);
     } catch (err) {
       console.error("Failed to update booking:", err);
-      alert("Failed to update booking.");
+      alert(err.response?.data?.message || "Time conflict detected or invalid data provided.");
     } finally {
       setIsSaving(false);
     }
@@ -204,6 +204,14 @@ const BookingAnalytics = () => {
           </button>
         </div>
       </div>
+      
+      {error && (
+        <div className="bg-rose-50 border-2 border-rose-100 text-rose-600 p-8 rounded-[2rem] flex flex-col items-center gap-4 text-center mb-10">
+          <XCircle size={40} className="text-rose-400" />
+          <div className="font-bold text-lg">{error}</div>
+          <button onClick={fetchBookings} className="px-6 py-2 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all">Retry</button>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
@@ -334,14 +342,17 @@ const BookingAnalytics = () => {
                         <td colSpan="5" className="p-8">
                           <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-5 gap-6 p-8 bg-white rounded-3xl border-2 border-indigo-200 shadow-2xl">
                             <div className="md:col-span-2">
-                              <label className="block text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Location</label>
-                              <input
-                                type="text"
-                                required
-                                value={editForm.resource}
-                                onChange={(e) => setEditForm({...editForm, resource: e.target.value})}
-                                className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-100 focus:border-indigo-400 outline-none font-bold"
-                              />
+                              <label className="block text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Location / Resource</label>
+                              <div className="relative">
+                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+                                <input
+                                  type="text"
+                                  required
+                                  value={editForm.resource}
+                                  onChange={(e) => setEditForm({...editForm, resource: e.target.value})}
+                                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border-2 border-slate-100 focus:border-indigo-400 transition-all outline-none font-bold"
+                                />
+                              </div>
                             </div>
                             <div>
                               <label className="block text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Date</label>
@@ -387,13 +398,13 @@ const BookingAnalytics = () => {
                                  <option value="CANCELLED">CANCELLED</option>
                                </select>
                             </div>
-                            <div className="md:col-span-5 flex justify-end gap-3">
-                              <button type="button" onClick={cancelEdit} className="px-6 py-2.5 text-sm font-bold text-slate-400">Cancel</button>
-                              <button type="submit" disabled={isSaving} className="px-10 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg flex items-center gap-2">
-                                {isSaving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-                                Update
-                              </button>
-                            </div>
+                             <div className="md:col-span-5 flex justify-end gap-3 mt-4">
+                               <button type="button" onClick={cancelEdit} className="px-6 py-2.5 text-sm font-bold text-slate-400 hover:text-slate-600">Cancel</button>
+                               <button type="submit" disabled={isSaving} className="px-10 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg transition-all flex items-center gap-2">
+                                 {isSaving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+                                 Apply Changes
+                               </button>
+                             </div>
                           </form>
                         </td>
                       ) : (
