@@ -1,4 +1,5 @@
 package com.project.paf.ticket;
+
 import com.project.paf.modules.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

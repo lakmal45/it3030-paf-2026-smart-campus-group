@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.lang.NonNull;
 import java.util.Objects;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -97,7 +98,7 @@ public class TicketService {
      * @param currentUser authenticated caller
      * @return updated ticket
      */
-    public TicketResponse updateTicket(Long id, UpdateTicketRequest request, User currentUser) {
+    public TicketResponse updateTicket(@NonNull Long id, UpdateTicketRequest request, User currentUser) {
         IncidentTicket ticket = findTicketOrThrow(id);
 
         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
@@ -129,7 +130,7 @@ public class TicketService {
      * @throws ResourceNotFoundException if no ticket exists with the given id
      */
     @Transactional(readOnly = true)
-    public TicketResponse getTicketById(Long id) {
+    public TicketResponse getTicketById(@NonNull Long id) {
         IncidentTicket ticket = findTicketOrThrow(id);
         return mapToResponse(ticket);
     }
@@ -208,7 +209,7 @@ public class TicketService {
      * @return updated ticket as {@link TicketResponse}
      * @throws IllegalStateException if the transition is not permitted
      */
-    public TicketResponse updateTicketStatus(Long id,
+    public TicketResponse updateTicketStatus(@NonNull Long id,
                                              UpdateTicketStatusRequest request,
                                              User currentUser) {
         if (currentUser.getRole() == Role.USER) {
@@ -246,7 +247,7 @@ public class TicketService {
      * @return updated ticket as {@link TicketResponse}
      * @throws ResourceNotFoundException if the technician user does not exist
      */
-    public TicketResponse assignTechnician(Long ticketId, Long technicianId, User currentUser) {
+    public TicketResponse assignTechnician(@NonNull Long ticketId, @NonNull Long technicianId, User currentUser) {
         if (currentUser.getRole() != Role.ADMIN) {
             throw new AccessDeniedException("Only ADMIN can assign technicians.");
         }
@@ -288,7 +289,7 @@ public class TicketService {
      * @return updated ticket as {@link TicketResponse}
      * @throws IllegalStateException if the upload would exceed the 3-image limit
      */
-    public TicketResponse uploadImages(Long ticketId, List<MultipartFile> files) {
+    public TicketResponse uploadImages(@NonNull Long ticketId, List<MultipartFile> files) {
         IncidentTicket ticket = findTicketOrThrow(ticketId);
 
         int existing = ticket.getImageUrls().size();
@@ -314,7 +315,7 @@ public class TicketService {
      * @param id          ticket to delete
      * @param currentUser must be ADMIN
      */
-    public void deleteTicket(Long id, User currentUser) {
+    public void deleteTicket(@NonNull Long id, User currentUser) {
         IncidentTicket ticket = findTicketOrThrow(id);
         
         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
@@ -342,7 +343,7 @@ public class TicketService {
      * @param currentUser the authenticated author
      * @return the persisted comment as {@link CommentResponse}
      */
-    public CommentResponse addComment(Long ticketId, CommentRequest request, User currentUser) {
+    public CommentResponse addComment(@NonNull Long ticketId, CommentRequest request, User currentUser) {
         IncidentTicket ticket = findTicketOrThrow(ticketId);
 
         TicketComment comment = new TicketComment();
@@ -375,7 +376,7 @@ public class TicketService {
      * @return updated comment as {@link CommentResponse}
      * @throws AccessDeniedException if the caller is not the author or ADMIN
      */
-    public CommentResponse editComment(Long commentId, CommentRequest request, User currentUser) {
+    public CommentResponse editComment(@NonNull Long commentId, CommentRequest request, User currentUser) {
         TicketComment comment = findCommentOrThrow(commentId);
         assertOwnerOrAdmin(comment.getAuthor(), currentUser, "edit");
 
@@ -392,7 +393,7 @@ public class TicketService {
      * @param currentUser the authenticated caller
      * @throws AccessDeniedException if the caller is not the author or ADMIN
      */
-    public void deleteComment(Long commentId, User currentUser) {
+    public void deleteComment(@NonNull Long commentId, User currentUser) {
         TicketComment comment = findCommentOrThrow(commentId);
         assertOwnerOrAdmin(comment.getAuthor(), currentUser, "delete");
         commentRepository.delete(comment);
@@ -406,7 +407,7 @@ public class TicketService {
      * @return list of {@link CommentResponse}
      */
     @Transactional(readOnly = true)
-    public List<CommentResponse> getComments(Long ticketId) {
+    public List<CommentResponse> getComments(@NonNull Long ticketId) {
         IncidentTicket ticket = findTicketOrThrow(ticketId);
         return commentRepository.findByTicketOrderByCreatedAtAsc(ticket)
                 .stream()
@@ -418,12 +419,12 @@ public class TicketService {
     // Private helpers
     // ─────────────────────────────────────────────────────────────────────────
 
-    private IncidentTicket findTicketOrThrow(Long id) {
+    private IncidentTicket findTicketOrThrow(@NonNull Long id) {
         return ticketRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + id));
     }
 
-    private TicketComment findCommentOrThrow(Long id) {
+    private TicketComment findCommentOrThrow(@NonNull Long id) {
         return commentRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + id));
     }
