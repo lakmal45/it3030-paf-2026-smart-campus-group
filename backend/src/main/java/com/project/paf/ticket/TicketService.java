@@ -287,6 +287,7 @@ public class TicketService {
      * @param currentUser authenticated caller
      * @return updated ticket
      */
+    @SuppressWarnings("null")
     public TicketResponse submitFeedback(Long id, SubmitFeedbackRequest request, User currentUser) {
         IncidentTicket ticket = findTicketOrThrow(id);
 

@@ -62,6 +62,7 @@ public class EmailService {
      * @param htmlContent HTML body
      */
     @Async("emailTaskExecutor")
+    @SuppressWarnings("null")
     public void sendHtmlEmail(String to, String toName, String subject, String htmlContent) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
