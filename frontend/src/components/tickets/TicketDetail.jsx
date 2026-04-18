@@ -138,8 +138,9 @@ const TicketDetail = () => {
   if (!ticket) return null;
 
   const role = user?.role || "USER";
-  const isAdmin = role === "ADMIN";
-  const isTechnician = role === "TECHNICIAN";
+  const isAdmin = role === "ADMIN" || role === "ROLE_ADMIN";
+  const isTechnician = role === "TECHNICIAN" || role === "ROLE_TECHNICIAN";
+  const isManager = role === "MANAGER" || role === "ROLE_MANAGER";
   const canUpdateStatus = isAdmin || isTechnician;
 
   // The baseUrl for uploaded files. Assuming Spring Boot runs on 8081 and serves static content.
