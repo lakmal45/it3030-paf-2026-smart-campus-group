@@ -147,9 +147,10 @@ const ActivitySkeleton = () => (
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
-  const [users,         setUsers]         = useState(null);
-  const [tickets,       setTickets]       = useState(null);
-  const [notifications, setNotifications] = useState(null);
+  const [users,         setUsers]         = useState([]);
+  const [tickets,       setTickets]       = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [totalTicketCount, setTotalTicketCount] = useState(0);
   const [initialLoad,   setInitialLoad]   = useState(true);
   const [refreshing,    setRefreshing]    = useState(false);
   const [error,         setError]         = useState(null);
@@ -161,9 +162,10 @@ const AdminDashboard = () => {
         ticketService.getAll(),
         api.get('/notifications'),
       ]);
-      setUsers(usersRes.data);
-      setTickets(ticketsRes.data);
-      setNotifications(notifsRes.data);
+      setUsers(usersRes.data || []);
+      setTickets(ticketsRes.data?.content || []);
+      setTotalTicketCount(ticketsRes.data?.totalElements ?? ticketsRes.data?.content?.length ?? 0);
+      setNotifications(notifsRes.data || []);
       setError(null);
     } catch (err) {
       console.error('AdminDashboard fetch error:', err);
@@ -186,7 +188,7 @@ const AdminDashboard = () => {
 
   // ── Derived stats ──────────────────────────────────────────────────────────
   const totalUsers      = users?.length    ?? 0;
-  const totalTickets    = tickets?.length  ?? 0;
+  const totalTickets    = totalTicketCount;
   const openTickets     = tickets?.filter(t => t.status === 'OPEN').length        ?? 0;
   const resolvedTickets = tickets?.filter(t => ['RESOLVED','CLOSED'].includes(t.status)).length ?? 0;
 

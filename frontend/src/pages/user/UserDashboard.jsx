@@ -129,8 +129,8 @@ const UserDashboard = () => {
   const { user }  = useAuth();
   const navigate  = useNavigate();
 
-  const [tickets,       setTickets]       = useState(null);
-  const [notifications, setNotifications] = useState(null);
+  const [tickets,       setTickets]       = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [unreadCount,   setUnreadCount]   = useState(null);
   const [initialLoad,   setInitialLoad]   = useState(true);
   const [refreshing,    setRefreshing]    = useState(false);
@@ -143,8 +143,8 @@ const UserDashboard = () => {
         api.get('/notifications'),
         api.get('/notifications/unread-count'),
       ]);
-      setTickets(ticketsRes.data);
-      setNotifications(notifsRes.data);
+      setTickets(ticketsRes.data?.content || []);
+      setNotifications(notifsRes.data || []);
       setUnreadCount(countRes.data);
       setError(null);
     } catch (err) {
