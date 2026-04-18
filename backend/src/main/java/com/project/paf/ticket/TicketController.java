@@ -127,9 +127,6 @@ public class TicketController {
     }
 
     /**
-     * PUT /api/tickets/{id}/assign — Assign a technician to a ticket.
-     * Only ADMIN may call this endpoint.
-     */
     @PutMapping("/{id}/assign")
     public ResponseEntity<TicketResponse> assignTechnician(
             @PathVariable @NonNull Long id,
@@ -141,6 +138,21 @@ public class TicketController {
         requireRoles(currentUser, Role.ADMIN);
         return ResponseEntity.ok(
                 ticketService.assignTechnician(id, java.util.Objects.requireNonNull(request.getTechnicianId()), currentUser));
+    }
+
+    /**
+     * PUT /api/tickets/{id}/feedback — Submit user rating and feedback.
+     * Only the ticket creator may call this endpoint for RESOLVED/CLOSED tickets.
+     */
+    @PutMapping("/{id}/feedback")
+    public ResponseEntity<TicketResponse> submitFeedback(
+            @PathVariable Long id,
+            @Valid @RequestBody SubmitFeedbackRequest request,
+            HttpSession session,
+            @RequestHeader(value = "X-User-Email", required = false) String emailHeader) {
+
+        User currentUser = resolveUser(session, emailHeader);
+        return ResponseEntity.ok(ticketService.submitFeedback(id, request, currentUser));
     }
 
     /**
