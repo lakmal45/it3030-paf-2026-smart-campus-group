@@ -278,7 +278,7 @@ const AdminDashboard = () => {
 
           {refreshing ? (
             <ChartSkeleton />
-          ) : tickets.length === 0 ? (
+          ) : !tickets || tickets.length === 0 ? (
             <div className="h-[260px] flex flex-col items-center justify-center text-slate-400">
               <Ticket size={40} className="mb-2 opacity-40" />
               <p className="text-sm font-medium">No tickets in the system yet</p>
