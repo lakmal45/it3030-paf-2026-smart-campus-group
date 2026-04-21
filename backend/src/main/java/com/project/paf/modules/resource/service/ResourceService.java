@@ -74,6 +74,7 @@ public class ResourceService {
         existingResource.setAvailable(requestDTO.getAvailable());
         existingResource.setStatus(requestDTO.getStatus());
         existingResource.setDescription(requestDTO.getDescription());
+        existingResource.setAvailabilityWindows(requestDTO.getAvailabilityWindows());
 
         Resource updatedResource = resourceRepository.save(java.util.Objects.requireNonNull(existingResource));
 
